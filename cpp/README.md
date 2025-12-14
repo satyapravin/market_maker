@@ -50,7 +50,6 @@ The C++ system implements a clean, multi-process architecture where each exchang
 2. **Orders**: `trader` → `trading_engine` (new orders)
 3. **Order Events**: `trading_engine` → `trader` (fills, rejects)
 4. **Positions**: `position_server` → `trader` (position updates)
-5. **Inventory**: External → `trader` (DeFi LP inventory deltas)
 
 ### Exchange Integration
 
