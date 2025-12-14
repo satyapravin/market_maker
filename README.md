@@ -80,10 +80,10 @@ export BINANCE_API_SECRET=your_api_secret
 
 ## Supported Exchanges
 
-| Exchange | Status | Features |
-|----------|--------|----------|
+| Exchange | Status | Asset Types |
+|----------|--------|-------------|
 | **Binance** | ✅ Complete | Futures, Spot |
-| **Deribit** | ✅ Complete | Perpetuals, Options |
+| **Deribit** | ✅ Complete | Perpetuals |
 | **GRVT** | ✅ Complete | Perpetuals |
 
 ## Key Features
