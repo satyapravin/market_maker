@@ -1,6 +1,6 @@
 # Dependency Installation Guide
 
-This guide helps you install all required dependencies for building the Asymmetric LP trading system.
+This guide helps you install all required dependencies for building the C++ trading system.
 
 ## System Dependencies
 
@@ -24,11 +24,7 @@ sudo apt-get install -y \
     libsimdjson-dev \
     libprotobuf-dev \
     protobuf-compiler \
-    libuv1-dev \
-    python3 \
-    python3-pip \
-    python3-venv \
-    python3-dev
+    libuv1-dev
 ```
 
 ### CentOS/RHEL/Fedora
@@ -48,11 +44,7 @@ sudo dnf install -y \
     simdjson-devel \
     protobuf-devel \
     protobuf-compiler \
-    libuv-devel \
-    python3 \
-    python3-pip \
-    python3-venv \
-    python3-devel
+    libuv-devel
 
 # For older CentOS/RHEL 7
 sudo yum install -y \
@@ -68,11 +60,7 @@ sudo yum install -y \
     simdjson-devel \
     protobuf-devel \
     protobuf-compiler \
-    libuv-devel \
-    python3 \
-    python3-pip \
-    python3-venv \
-    python3-devel
+    libuv-devel
 ```
 
 ### macOS (with Homebrew)
@@ -92,24 +80,7 @@ brew install \
     jsoncpp \
     simdjson \
     protobuf \
-    libuv \
-    python3
-```
-
-## Python Dependencies
-
-After installing system dependencies, install Python packages:
-
-```bash
-# Navigate to Python directory
-cd python
-
-# Create virtual environment (recommended)
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install Python dependencies
-pip install -r requirements.txt
+    libuv
 ```
 
 ## Verification

@@ -1,150 +1,14 @@
 # System Components Overview
 
-This document provides a comprehensive description of all components in the Asymmetric LP trading system.
+This document provides a comprehensive description of all components in the C++ market making trading system.
 
 ## System Architecture
 
-The system consists of two main components:
-1. **Python DeFi Component** - Uniswap V3 liquidity provision
-2. **C++ CeFi Component** - Centralized exchange market making
+The system is a **C++ multi-process trading system** for centralized exchange market making.
 
 ---
 
-## Python DeFi Component
-
-### Core Components
-
-#### 1. **Main Application** (`main.py`)
-- **Purpose**: Entry point for both live trading and backtesting
-- **Modes**:
-  - **Live Trading Mode**: Connects to Uniswap V3, manages LP positions
-  - **Historical Backtesting Mode**: Simulates trading on historical OHLC data
-- **Features**:
-  - Configuration loading and validation
-  - Signal handling for graceful shutdown
-  - Mode selection (live vs backtest)
-
-#### 2. **Automated Rebalancer** (`automated_rebalancer.py`)
-- **Purpose**: Orchestrates the LP rebalancing strategy
-- **Responsibilities**:
-  - Monitors inventory position
-  - Triggers rebalancing when thresholds are exceeded
-  - Manages LP position lifecycle (mint, modify, burn)
-  - Publishes inventory deltas via ZMQ (for CeFi integration)
-- **Key Features**:
-  - Edge-triggered rebalancing (not time-based)
-  - Model-driven range calculation
-  - Fee tracking and PnL calculation
-
-#### 3. **LP Position Manager** (`lp_position_manager.py`)
-- **Purpose**: Manages Uniswap V3 LP positions
-- **Responsibilities**:
-  - Calculate tick ranges for liquidity positions
-  - Compute liquidity amounts from token balances
-  - Add/remove liquidity to pools
-  - Query position state from blockchain
-- **Key Methods**:
-  - `calculate_tick_range()` - Computes tick bounds
-  - `add_liquidity()` - Mints new LP position
-  - `remove_liquidity()` - Burns LP position
-  - `modify_liquidity()` - Updates existing position
-
-#### 4. **Uniswap V3 Client** (`uniswap_client.py`)
-- **Purpose**: Blockchain interaction layer for Uniswap V3
-- **Responsibilities**:
-  - Web3 connection management
-  - Contract interaction (Factory, Pool, Position Manager, Router)
-  - Token balance queries
-  - Transaction building and signing
-  - Gas estimation
-- **Key Features**:
-  - Multi-chain support (Ethereum, Arbitrum, Polygon, etc.)
-  - Contract ABI management
-  - Error handling and retries
-
-#### 5. **Strategy** (`strategy.py`)
-- **Purpose**: Implements the asymmetric LP strategy logic
-- **Responsibilities**:
-  - Inventory ratio calculation
-  - Range width determination
-  - Rebalancing decision logic
-  - Position valuation
-- **Key Features**:
-  - Asymmetric range allocation (wide for excess, narrow for deficit)
-  - Target inventory ratio tracking
-  - Deviation threshold monitoring
-
-#### 6. **Inventory Models** (`models/`)
-
-##### **Base Model** (`base_model.py`)
-- Abstract interface for all inventory models
-- Defines `calculate_lp_ranges()` method signature
-- Provides common utilities
-
-##### **Avellaneda-Stoikov Model** (`avellaneda_stoikov.py`)
-- **Purpose**: Classic market-making model adapted for LP
-- **Key Parameters**:
-  - Risk aversion coefficient
-  - Target inventory ratio
-  - Volatility window
-- **Features**:
-  - Dynamic spread calculation
-  - Volatility-based range sizing
-  - Inventory risk management
-
-##### **GLFT Model** (`glft_model.py`)
-- **Purpose**: Finite inventory model with execution costs
-- **Key Parameters**:
-  - Execution cost
-  - Inventory penalty
-  - Terminal inventory penalty
-  - Max position size constraints
-- **Features**:
-  - Execution cost optimization
-  - Inventory constraint handling
-  - Terminal condition penalties
-
-#### 7. **AMM Simulator** (`amm.py`)
-- **Purpose**: Uniswap V3 math implementation for backtesting
-- **Components**:
-  - `UniswapV3SingleSidedRange` - Single-sided range position
-  - `UniswapV3Pool` - Pool simulator with range positions
-  - Swap processing with fee collection
-- **Features**:
-  - Accurate Uniswap V3 math
-  - Fee tracking
-  - Position settlement
-
-#### 8. **Backtest Engine** (`backtest_engine.py`)
-- **Purpose**: Historical strategy simulation
-- **Responsibilities**:
-  - Load OHLC data from CSV
-  - Process trades chronologically
-  - Calculate PnL and fees
-  - Generate performance reports
-- **Features**:
-  - Real market data support
-  - Accurate fee simulation
-  - Performance metrics calculation
-
-#### 9. **OHLC Data Downloader** (`ohlc_downloader.py`)
-- **Purpose**: Downloads historical OHLC data from blockchain
-- **Features**:
-  - Fetches swap events from Uniswap V3 pools
-  - Builds OHLC bars (1-second intervals)
-  - Saves to CSV format
-- **Usage**: Used for backtesting data preparation
-
-#### 10. **Inventory Publisher** (`inventory_publisher.py`)
-- **Purpose**: Publishes inventory deltas to C++ component via ZMQ
-- **Features**:
-  - ZMQ publisher for inventory updates
-  - Real-time delta broadcasting
-  - Integration with CeFi market maker
-
----
-
-## C++ CeFi Component
+## C++ Trading System
 
 ### Process Architecture
 
@@ -488,7 +352,6 @@ Each exchange (Binance, Deribit, GRVT) implements **4 specialized interfaces**:
 2. **Order Generation**: Strategy → MiniOMS → ZMQ → Trading Engine → Exchange
 3. **Order Events**: Exchange → Trading Engine → ZMQ → MiniOMS → Strategy
 4. **Position Updates**: Exchange → Position Server → ZMQ → MiniPMS → Strategy
-5. **Inventory Deltas**: Python DeFi → ZMQ → Trader → Strategy (for hedging)
 
 ### Inter-Process Communication
 

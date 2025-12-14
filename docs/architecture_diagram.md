@@ -1,4 +1,4 @@
-# CeFi C++ Components Architecture Diagram
+# C++ Trading System Architecture Diagram
 
 > **Note**: This diagram uses Mermaid syntax and will render automatically on GitHub.
 
@@ -7,7 +7,6 @@
 ```mermaid
 graph TB
     subgraph "External Systems"
-        DEFI[Python DeFi Component<br/>Uniswap V3 LP]
         BINANCE[Binance Exchange]
         DERIBIT[Deribit Exchange]
         GRVT[GRVT Exchange]
@@ -77,7 +76,6 @@ graph TB
     end
 
     %% External connections
-    DEFI -->|Inventory Deltas| TRADER
     BINANCE -->|Market Data| SUB_BINANCE
     BINANCE -->|Orders/Account| OMS_BINANCE
     BINANCE -->|Positions| PMS_BINANCE
@@ -181,7 +179,7 @@ graph TB
     classDef utility fill:#fce4ec,stroke:#880e4f,stroke-width:2px
 
     class TRADER,MS_BINANCE,MS_DERIBIT,MS_GRVT,TE_BINANCE,TE_DERIBIT,TE_GRVT,PS_BINANCE,PS_DERIBIT,PS_GRVT process
-    class BINANCE,DERIBIT,GRVT,DEFI exchange
+    class BINANCE,DERIBIT,GRVT exchange
     class ZMQ_OMS,ZMQ_MDS,ZMQ_PMS,ZMQ_PUB_MD,ZMQ_PUB_OE,ZMQ_PUB_POS,ZMQ_SUB_OR zmq
     class SUB_BINANCE,SUB_DERIBIT,SUB_GRVT,OMS_BINANCE,OMS_DERIBIT,OMS_GRVT,PMS_BINANCE,PMS_DERIBIT,PMS_GRVT websocket
     class LOGGER,CONFIG,APP_SVC,MONITOR utility

@@ -1,30 +1,14 @@
-# Asymmetric LP - Deployment Guide
+# C++ Trading System - Deployment Guide
 
-## ⚠️ **C++ Servers Status: Architecture Complete, Production Testing Required**
+## ⚠️ **Status: Architecture Complete, Production Testing Required**
 
-**Python DeFi Component**: ✅ Production-ready  
-**C++ CeFi Component**: ⚠️ Architecture complete, untested in production
+**C++ Trading System**: ⚠️ Architecture complete, untested in production
 
 > **Note**: This guide contains all required configurations and deployment instructions. No separate configuration guide is needed.
 
 ### **COMPLETED FEATURES**
 
-#### ✅ **1. Dual-Venue Architecture**
-- **Python DeFi LP Component**: Uniswap V3 liquidity provision with sophisticated models
-- **C++ CeFi Multi-Process Component**: Centralized exchange market making
-- **ZMQ Integration Layer**: High-performance inter-component communication
-- **Inventory-Aware Hedging**: Statistical hedge using residual inventory
-
-#### ✅ **2. Python DeFi LP Component**
-- **Avellaneda-Stoikov Model**: Classic market-making model implementation
-- **GLFT Model**: Finite inventory constraints with execution costs
-- **Asymmetric Ranges**: Biased liquidity provision based on inventory
-- **Edge-triggered Rebalancing**: Efficient rebalance logic
-- **Fee Tier Optimization**: Dynamic 5 bps, 30 bps, 100 bps selection
-- **Real-time Backtesting**: Comprehensive strategy validation
-- **ZMQ Integration**: Inventory delta publishing to CeFi component
-
-#### ✅ **3. C++ Multi-Process Architecture**
+#### ✅ **1. C++ Multi-Process Architecture**
 - **Trader Process**: Strategy framework with Mini OMS (Work in Progress)
 - **Market Server (Per Exchange)**: Public market data streams
 - **Trading Engine (Per Exchange)**: Private trading operations (HTTP + WebSocket)
@@ -33,7 +17,7 @@
 - **Per-Process Configuration**: Independent configuration per process
 - **Status**: Architecture complete, requires production testing
 
-#### ✅ **4. Logging & Monitoring**
+#### ✅ **2. Logging & Monitoring**
 - **Centralized Logging System**: All `std::cout`/`std::cerr` replaced with logging macros
 - **Structured Logging**: JSON-formatted logs with metadata
 - **Log Levels**: DEBUG, INFO, WARN, ERROR with configurable levels
@@ -45,14 +29,14 @@
 - **Performance Metrics**: Built-in metrics collection per process
 - **Health Monitoring**: Process health checks and status reporting
 
-#### ✅ **5. Error Handling & Resilience**
+#### ✅ **3. Error Handling & Resilience**
 - **Process Isolation**: Failure in one process doesn't affect others
 - **Automatic Restart**: Failed processes automatically restart
 - **Circuit Breakers**: Automatic failure detection and recovery
 - **Retry Policies**: Exponential backoff with configurable limits
 - **Graceful Degradation**: System continues operating with reduced functionality
 
-#### ✅ **6. Comprehensive Test Suite**
+#### ✅ **4. Comprehensive Test Suite**
 - **200+ Test Cases**: Complete coverage across 7 test categories
 - **Integration Tests**: End-to-end workflow validation
 - **Performance Tests**: Latency and throughput benchmarks
@@ -62,7 +46,7 @@
 - **Process-Specific Tests**: Individual process validation
 - **Standalone Build System**: Independent test framework
 
-#### ✅ **7. Deployment & Operations**
+#### ✅ **5. Deployment & Operations**
 - **Process Management**: Individual process control and monitoring
 - **Resource Limits**: CPU and memory constraints per process
 - **Signal Handling**: Graceful shutdown on SIGTERM/SIGINT
@@ -74,27 +58,18 @@
 
 ### **Prerequisites**
 ```bash
-# Install Python dependencies
+# Update package list and install C++ build tools
 sudo apt-get update
-sudo apt-get install python3 python3-pip python3-venv
-
-# Install C++ build tools
 sudo apt-get install build-essential cmake
 ```
 
 ### **1. Clone and Setup**
 ```bash
 git clone <repository-url>
-cd asymmetric_lp
-
-# Setup Python environment
-cd python/
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+cd market_maker
 
 # Build C++ components
-cd ../cpp/
+cd cpp/
 mkdir build && cd build
 cmake .. && make -j4
 
@@ -116,11 +91,6 @@ DERIBIT_API_SECRET=your_deribit_api_secret
 GRVT_API_KEY=your_grvt_api_key
 GRVT_API_SECRET=your_grvt_api_secret
 
-# Python DeFi Configuration
-ETHEREUM_RPC_URL=https://mainnet.infura.io/v3/your_project_id
-WALLET_PRIVATE_KEY=your_wallet_private_key
-UNISWAP_V3_ROUTER_ADDRESS=0xE592427A0AEce92De3Edee1F18E0157C05861564
-
 # Optional
 LOG_LEVEL=INFO
 ENVIRONMENT=production
@@ -129,13 +99,8 @@ EOF
 
 ### **3. Configure Components**
 ```bash
-# Configure Python DeFi LP
-cd python/
-cp config.py.example config.py
-# Edit config.py with your parameters
-
 # Configure C++ processes
-cd ../cpp/
+cd cpp/
 cp config/trader.ini.example config/trader.ini
 cp config/market_server_binance.ini.example config/market_server_binance.ini
 cp config/trading_engine_binance.ini.example config/trading_engine_binance.ini
@@ -148,20 +113,14 @@ sed -i 's/your_binance_api_secret/'"$BINANCE_API_SECRET"'/g' config/*binance*.in
 
 ### **4. Start Trading System**
 ```bash
-# Start Python DeFi LP (Terminal 1)
-cd python/
-source venv/bin/activate
-python main.py --config config.py &
-
-# Start C++ CeFi processes (Terminal 2)
-cd ../cpp/build/
+# Start C++ processes
+cd cpp/build/
 ./bin/market_server BINANCE ../config/market_server_binance.ini &
 ./bin/trading_engine BINANCE ../config/trading_engine_binance.ini --daemon &
 ./bin/position_server BINANCE ../config/position_server_binance.ini &
 ./bin/trader ../config/trader.ini &
 
 # View logs
-tail -f logs/python_lp.log
 tail -f logs/trader.log
 tail -f logs/market_server_binance.log
 tail -f logs/trading_engine_binance.log
@@ -172,38 +131,9 @@ tail -f logs/position_server_binance.log
 
 ## ⚙️ **Complete Configuration Guide**
 
-This section contains all required configurations for both Python DeFi and C++ CeFi components. No additional configuration files are needed.
+This section contains all required configurations for the C++ trading system. No additional configuration files are needed.
 
-### **Python DeFi LP Configuration**
-The Python component uses `python/config.py` for configuration:
-
-```python
-# Trading Parameters
-BASE_SPREAD = 0.02          # 2% base spread
-REBALANCE_THRESHOLD = 0.10  # 10% inventory threshold
-FEE_TIER = 0.0005          # 5 bps fee tier
-MODEL_TYPE = "GLFT"        # GLFT or AS model
-
-# Uniswap V3 Configuration
-UNISWAP_V3_ROUTER = "0xE592427A0AEce92De3Edee1F18E0157C05861564"
-WETH_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
-USDC_ADDRESS = "0xA0b86a33E6441b8c4C8C0e4b8b4c4C0e4b8b4c4C"
-
-# Ethereum Configuration
-ETHEREUM_RPC_URL = "https://mainnet.infura.io/v3/your_project_id"
-WALLET_PRIVATE_KEY = "your_wallet_private_key"
-
-# ZMQ Configuration
-ZMQ_PUBLISHER_PORT = 6000   # Inventory delta publishing
-ZMQ_PUBLISHER_HOST = "127.0.0.1"
-
-# Risk Management
-MAX_POSITION_SIZE = 10.0    # Maximum position size in ETH
-MIN_LIQUIDITY = 0.1         # Minimum liquidity threshold
-MAX_SLIPPAGE = 0.005        # Maximum slippage tolerance
-```
-
-### **C++ CeFi Configuration (Per-Process)**
+### **C++ Configuration (Per-Process)**
 
 #### **Trader Configuration** (`cpp/config/trader.ini`)
 ```ini
@@ -260,11 +190,7 @@ COLLECT_ORDERBOOK=true
 ### **Environment Variables**
 | Variable | Description | Required |
 |----------|-------------|----------|
-| **Python DeFi Variables** | | |
-| `ETHEREUM_RPC_URL` | Ethereum RPC endpoint (Infura/Alchemy) | Yes |
-| `WALLET_PRIVATE_KEY` | Ethereum wallet private key | Yes |
-| `UNISWAP_V3_ROUTER_ADDRESS` | Uniswap V3 router contract address | No |
-| **C++ CeFi Variables** | | |
+| **Exchange Variables** | | |
 | `BINANCE_API_KEY` | Binance API key | Yes* |
 | `BINANCE_API_SECRET` | Binance API secret | Yes* |
 | `DERIBIT_API_KEY` | Deribit API key | Yes* |
@@ -284,12 +210,7 @@ COLLECT_ORDERBOOK=true
 
 ### **Logs**
 ```bash
-# View Python DeFi LP logs
-tail -f logs/python_lp.log
-tail -f logs/uniswap_v3_lp.log
-tail -f logs/inventory_publisher.log
-
-# View C++ CeFi process logs
+# View C++ process logs
 tail -f logs/trader.log
 tail -f logs/market_server_binance.log
 tail -f logs/trading_engine_binance.log
@@ -301,10 +222,6 @@ tail -f logs/*.log
 
 ### **Health Checks**
 ```bash
-# Check Python DeFi LP health
-ps aux | grep python
-pgrep -f "main.py"
-
 # Check C++ process health
 ps aux | grep trader
 ps aux | grep market_server
@@ -312,7 +229,6 @@ ps aux | grep trading_engine
 ps aux | grep position_server
 
 # Check ZMQ connectivity
-netstat -tulpn | grep :6000  # Inventory delta
 netstat -tulpn | grep :6001  # Market data
 netstat -tulpn | grep :6002  # Order events
 
@@ -322,15 +238,9 @@ cd cpp/tests/standalone_build/
 ```
 
 ### **Metrics**
-The system logs structured metrics for both components:
+The system logs structured metrics:
 
-**Python DeFi LP Metrics**:
-- **LP Performance**: Fee collection rates, impermanent loss
-- **Inventory Management**: Position tracking, rebalance frequency
-- **Model Performance**: GLFT/AS model effectiveness
-- **Gas Usage**: Transaction costs and optimization
-
-**C++ CeFi Metrics**:
+**C++ Trading Metrics**:
 - **Trader**: Order generation rates, strategy performance
 - **Quote Server**: Market data processing rates, WebSocket connection status
 - **Trading Engine**: Order execution rates, HTTP/WebSocket connectivity
@@ -419,18 +329,14 @@ cmake . && make run_tests
 ### **Starting/Stopping**
 ```bash
 # Start all processes manually
-cd python/
-source venv/bin/activate
-python main.py --config config.py &
-
-cd ../cpp/build/
+cd cpp/build/
 ./bin/market_server BINANCE ../config/market_server_binance.ini &
 ./bin/trading_engine BINANCE ../config/trading_engine_binance.ini --daemon &
 ./bin/position_server BINANCE ../config/position_server_binance.ini &
 ./bin/trader ../config/trader.ini &
 
 # Stop all processes gracefully
-pkill -f "market_server\|trading_engine\|position_server\|trader\|main.py"
+pkill -f "market_server\|trading_engine\|position_server\|trader"
 
 # Restart specific process
 pkill -f trader
@@ -575,7 +481,7 @@ cd ../tests/standalone_build/
 - Configuration files: `cpp/config/` directory
 
 ### **Emergency Procedures**
-1. **Stop All Trading**: `pkill -f "market_server|trading_engine|position_server|trader|main.py"`
+1. **Stop All Trading**: `pkill -f "market_server|trading_engine|position_server|trader"`
 2. **Stop Specific Exchange**: `pkill -f trading_engine_[exchange]`
 3. **Check Positions**: Review `data/positions.csv`
 4. **Manual Orders**: Use exchange web interface
@@ -610,4 +516,4 @@ cd ../tests/standalone_build/
 
 ---
 
-**🎉 The C++ multi-process trading system architecture is complete with comprehensive per-process configuration, dual connectivity (HTTP + WebSocket), robust inter-process communication, complete exchange integration, and a comprehensive test suite with 200+ test cases. However, production testing is required before live deployment.**
+**🎉 The C++ multi-process trading system architecture is complete with comprehensive per-process configuration, dual connectivity (HTTP + WebSocket), robust inter-process communication, complete exchange integration, and a comprehensive test suite. However, production testing is required before live deployment.**
